@@ -6,7 +6,7 @@
 <main>
     <div class = 'w-[475px] p-4 h-screen bg-black overflow-hidden relative'>
         <div class = 'absolute inset-0 z-0 pointer-events-none opacity-60 blur-md'>
-            <ThreeParticles />
+            <ThreeParticles colorParticles = {localStorage.getItem("Color")} />
         </div>
         <div class = 'relative z-10 flex flex-col justify-between h-full'>
             <div class = 'w-full text-white flex flex-row justify-between items-center sticky mb-5 -ml-2'>
@@ -15,7 +15,7 @@
                 </button>
                 <div class = 'flex flex-row -mr-2'>
                     <Icon icon = 'material-symbols-light:ink-pen-rounded' showCircle = {false} height = {10}/>
-                    <div class = 'text-yellow-400'>
+                    <div style = 'color:{localStorage.getItem("Color")}'>
                         <Icon icon = 'material-symbols-light:pentagon-rounded' showCircle = {false} height = {10} />
                     </div>
                 </div>

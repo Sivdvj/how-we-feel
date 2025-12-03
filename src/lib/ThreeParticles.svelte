@@ -2,7 +2,8 @@
   import { onMount } from "svelte";
   import * as THREE from 'three';
   import { createNoise2D, createNoise3D } from 'simplex-noise';
-  
+  export let colorParticles = ""
+
   let container;
 
   onMount(() => {
@@ -37,7 +38,7 @@
 
     let material = new THREE.PointsMaterial({
       size: 2.5,
-      color: 0xff8800,
+      color: colorParticles,
       map: new THREE.TextureLoader().load("https://threejs.org/examples/textures/sprites/spark1.png"),
       blending: THREE.AdditiveBlending,
       transparent: true,

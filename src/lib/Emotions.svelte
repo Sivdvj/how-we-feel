@@ -49,9 +49,9 @@
     $:if (closest){
         let text = getText(closest.i, closest.j)
         let color = getColor(closest.i, closest.j)
-        localStorage.setItem("Emotion", text)
-        localStorage.setItem("Color", color) 
-        localStorage.setItem("Text", t)
+        // localStorage.setItem("Emotion", text)
+        // localStorage.setItem("Color", color) 
+        // localStorage.setItem("Text", t)
         texts.set(t)
         emotion.set(text)
         colors.set(color)

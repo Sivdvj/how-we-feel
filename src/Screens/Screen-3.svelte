@@ -45,6 +45,9 @@
             </div>
             <button class = 'cursor-pointer' 
                 on:click={() => {
+                    localStorage.setItem("Emotion", ($emotion))
+                    localStorage.setItem("Color", ($colors))
+                    localStorage.setItem("Text", ($texts))
                     goto('screen4')
                 }}>
                 <Icons icon = 'material-symbols-light:arrow-forward-rounded' size = {20} opacity = {100} fill = '#ffffff' />
