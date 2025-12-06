@@ -2,6 +2,8 @@
     import Icon from '../lib/Icons.svelte'
     import ThreeParticles from '../lib/ThreeParticles.svelte';
     export let goto
+
+
 </script>
 <main>
     <div class = 'w-[475px] p-4 h-screen bg-black overflow-hidden relative'>
@@ -39,18 +41,19 @@
             </div>
             <div class = 'grid grid-cols-7 grid-rows-1 text-white gap-2 mt-auto'>
                 <button class = 'col-span-6 text-center bg-white/80 text-black p-4 rounded-full font-semibold hover:bg-gray-100/60 cursor-pointer' 
-                    on:click={() => {
-                        let id = localStorage.getItem("currID")
+                    on:click={async () => {
                         let emo = localStorage.getItem("Emotion")
                         let color = localStorage.getItem("Color")
-                        const userdata = {
-                            "emotion" : emo,
-                            "color" : color
+                        let Id = localStorage.getItem("currID")
+                        try{
+                            await fetch("http://localhost:3000/save", {
+                            method : "POST",
+                            headers : {"Content-Type" : "application/json"},
+                            body : JSON.stringify({Id, emo, color})
+                            })
+                        } catch (err){
+                            console.error("Fetch Failed", err)
                         }
-                        const data = JSON.parse(localStorage.getItem("data")) || {}
-                        data[id] = userdata
-                        localStorage.setItem("data", JSON.stringify(data))
-
                         goto('screen7')
                     }}
                 >

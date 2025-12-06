@@ -22,10 +22,15 @@
         <p class = 'text-white font-bold font-serif text-center text-3xl'>How are you feeling<br />this evening?</p>
         <div class = 'h-full flex justify-center items-center relative'>
             <button class='absolute z-10 flex flex-col items-center cursor-pointer' 
-                on:click={() => {
-                    let curr = localStorage.getItem("currID");
-                    curr = curr ? (parseInt(curr) + 1).toString() : '1';
-                    localStorage.setItem("currID", curr);
+                on:click={async () => {
+                    
+                    let res = await fetch("http://localhost:3000/save")
+                    let fetched = await res.json()
+                    let curr = fetched.ID
+                    console.log(curr)
+                    curr = (parseInt(curr, 10) + 1).toString()
+                    console.log(curr)
+                    localStorage.setItem("currID", curr)
                     
                     goto("screen2");
                 }}>

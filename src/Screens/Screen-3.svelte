@@ -50,6 +50,7 @@
                     localStorage.setItem("Text", ($texts))
                     goto('screen4')
                 }}>
+                <div class = 'w-20 h-20 hidden'></div>
                 <Icons icon = 'material-symbols-light:arrow-forward-rounded' size = {20} opacity = {100} fill = '#ffffff' />
             </button>
         </div>

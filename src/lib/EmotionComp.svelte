@@ -1,7 +1,15 @@
 <script>
+    import {onMount} from 'svelte'
     import Ecomp1 from './Ecomp1.svelte'
     
-    let data = JSON.parse(localStorage.getItem("data")) || []
+    let fetched = {}
+    let data = {}
+    onMount(async () => {
+        let res = await fetch("http://localhost:3000/save")
+        fetched = await res.json()
+        console.log(fetched.Emotions)
+        data = fetched.Emotions
+    })
     function getImage(color){
         if(color == "#ffa500") return "src/assets/1.png"
         else if(color == "#83f28f") return "src/assets/2.png"
