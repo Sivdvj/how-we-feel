@@ -2,6 +2,7 @@
     import Icon from '../lib/Icons.svelte'
     import ThreeParticles from '../lib/ThreeParticles.svelte';
     export let goto
+    let message =''
 </script>
 <main>
     <div class = 'w-[475px] p-4 h-screen bg-black overflow-hidden relative'>
@@ -23,6 +24,7 @@
             <div class = 'text-white font-serif font-bold text-center'>
                 <p>Describe what might be causing you to feel</p>
                 <p style = "color: {localStorage.getItem('Color')}" class = 'text-xl font-extrabold'>{localStorage.getItem("Emotion")}</p>
+                <br/><input type="text" placeholder="describe" bind:value={message} class="outline-none text-center placeholder:italic font-light" />
             </div>
             <div class = ' text-white flex flex-row justify-between items-start'>
                 <div class = 'flex flex-row'>
@@ -30,7 +32,11 @@
                     <Icon icon = 'weui:camera-outlined' fill = '#242424' size = {20} width = {8} height = {8} />
                     <Icon icon = 'octicon:sparkle-24' fill = '#242424' size = {20} width = {8} height = {8} />
                 </div>
-                <button class='text-black cursor-pointer' on:click={() => goto('screen6')}>
+                <button class='text-black cursor-pointer' 
+                on:click={() => {
+                    localStorage.setItem('Feeling', message)
+                    goto('screen6')
+                }}>
                     <Icon icon = 'material-symbols-light:arrow-forward-rounded' fill = '#ffffff' size = {20} />
                 </button>
             </div>
