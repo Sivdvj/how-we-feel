@@ -26,10 +26,10 @@ app.use(express.json())
 app.post('/signin', (req, res) => {
     let {firstname, username, password} = req.body
     if(!username || !password){
-        return res.json({error : 'Missing fields'})
+        return res.status(401).json({error : 'Missing fields'})
     }
     if(users[username]){
-        return res.json({error : 'Username already exists'})
+        return res.status(401).json({error : 'Username already exists'})
     }
 
     users[username] = {
@@ -48,22 +48,25 @@ app.post('/signin', (req, res) => {
 app.post('/login', (req, res) => {
     let {username, password} = req.body
     if(!username || !password){
-        return res.json({error : 'Missing fields'})
+        return res.status(401).json({error : 'Missing fields'})
     }
     if(!users[username]){
-        return res.json({error : 'Username does not exist'})
+        return res.status(401).json({error : 'Username does not exist'})
     }
     if(users[username].Password != password){
-        return res.json({error : 'Invalid Password'})
+        return res.status(401).json({error : 'Invalid Password'})
     }
     let sid = randomString()
+    console.log(sid)
     session[sid] = username
+    console.log(session[sid])
     res.json({Sid: sid, ok : true})
 })
 
 app.use((req, res, next) => {
     let {Sid} = req.body
-    if(!session[Sid]) return res.json({error: 'Unauthorized'})
+    console.log(session[Sid])
+    if(!session[Sid]) return res.status(401).json({error: 'Unauthorized'})
     req.username = session[Sid]
     next()
 })

@@ -6,8 +6,9 @@
     import Screen5 from "./Screens/Screen-5.svelte"
     import Screen6 from "./Screens/Screen-6.svelte"
     import Screen7 from "./Screens/Screen-7.svelte"
-
-    let screen = localStorage.getItem("ScreenName") || "screen1"
+    import Authentication from "./Screens/Authentication.svelte"
+    import Signin from "./Screens/Signin.svelte"
+    let screen = localStorage.getItem("ScreenName") || "authentication"
     
     function goto(screenName){
         screen = screenName
@@ -15,7 +16,11 @@
     }
 </script>
 
-{#if screen == "screen1"}
+{#if screen == "authentication"}
+    <Authentication {goto} />
+{:else if screen == "signin"}
+    <Signin {goto} />
+{:else if screen == "screen1"}
     <Screen1 {goto} />
 {:else if screen == "screen2"}
     <Screen2 {goto} />

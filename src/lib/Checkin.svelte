@@ -2,6 +2,7 @@
     import Settings from "@iconify-svelte/material-symbols-light/settings-outline-rounded"
     import Donate from "@iconify-svelte/material-symbols-light/heart-plus-outline"
     import Icons from "./Icons.svelte"
+    import { request } from "./Auth";
     export let goto
 </script>
 
@@ -23,19 +24,13 @@
         <div class = 'h-full flex justify-center items-center relative'>
             <button class='absolute z-10 flex flex-col items-center cursor-pointer' 
                 on:click={async () => {
-                    
-                    let res = await fetch("http://localhost:3000/save")
-                    let fetched = await res.json()
-                    let curr = fetched.ID
-                    console.log(curr)
+                    let curr = await request("/data")
+                    curr = curr.ID
                     curr = (parseInt(curr, 10) + 1).toString()
-                    console.log(curr)
                     localStorage.setItem("currID", curr)
-                    
-                    goto("screen2");
+                    goto("screen2")
                 }}>
                 <Icons icon='material-symbols-light:add-2-rounded' size={12} fill='#ffffff'/>
-                <!-- <Settings class = 'h-8 w-8 text-white opacity-70'/> -->
                 <div class="w-12 h-12 hidden"></div>
                 <p class = 'text-white text-xs'>Check in</p>
             </button>

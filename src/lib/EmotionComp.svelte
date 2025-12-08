@@ -1,14 +1,12 @@
 <script>
     import {onMount} from 'svelte'
     import Ecomp1 from './Ecomp1.svelte'
+    import { request } from './Auth';
     
-    let fetched = {}
     let data = {}
     onMount(async () => {
-        let res = await fetch("http://localhost:3000/save")
-        fetched = await res.json()
-        console.log(fetched.Emotions)
-        data = fetched.Emotions
+        data = await request("/data")
+        data = data.Emotion
     })
     function getImage(color){
         if(color == "#ffa500") return "src/assets/1.png"
@@ -19,6 +17,7 @@
 </script>
 <main>
     <div class = 'flex flex-col-reverse'>
+        {console.log(data)}
         {#each Object.entries(data) as [id, userdata]}
             <Ecomp1 color={userdata.color} text={userdata.emotion} image={getImage(userdata.color)}/>
         {/each}

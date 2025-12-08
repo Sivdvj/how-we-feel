@@ -1,9 +1,8 @@
 <script>
+    import { request } from '../lib/Auth';
     import Icon from '../lib/Icons.svelte'
     import ThreeParticles from '../lib/ThreeParticles.svelte';
     export let goto
-
-
 </script>
 <main>
     <div class = 'w-[475px] p-4 h-screen bg-black overflow-hidden relative'>
@@ -45,15 +44,7 @@
                         let emo = localStorage.getItem("Emotion")
                         let color = localStorage.getItem("Color")
                         let Id = localStorage.getItem("currID")
-                        try{
-                            await fetch("http://localhost:3000/save", {
-                            method : "POST",
-                            headers : {"Content-Type" : "application/json"},
-                            body : JSON.stringify({Id, emo, color})
-                            })
-                        } catch (err){
-                            console.error("Fetch Failed", err)
-                        }
+                        await request("/save", {Id, emo, color})
                         goto('screen7')
                     }}
                 >
