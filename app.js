@@ -3,8 +3,6 @@ import cors from 'cors'
 const app = express()
 const port = 3000
 
-let data = {}
-let currID = '0'
 let session = {}
 let users = {}
 let userdata = {}
@@ -63,27 +61,22 @@ app.post('/login', (req, res) => {
     res.json({Sid: sid, ok : true})
 })
 
+app.use((req, res, next) => {
+    let {Sid} = req.body
+    if(!session[Sid]) return res.json({error: 'Unauthorized'})
+    req.username = session[Sid]
+    next()
+})
+
 app.post('/save', (req, res) => {
-    let {Sid, Id, emo, color} = req.body
-    if(!session[Sid]) res.json({error: 'Unauthorized'})
-    let username = session[Sid]
-    userdata[username].ID = Id
-    userdata[username].Emotion[Id] = {"emotion" : emo, "color" : color}
+    let {Id, emo, color} = req.body
+    userdata[req.username].ID = Id
+    userdata[req.username].Emotion[Id] = {"emotion" : emo, "color" : color}
     res.json({ok : true})
 })
 
-app.post('/emotions', (req, res) => {
-    let {Sid} = req.body
-    if(!session[Sid]) res.json({error: 'Unauthorized'})
-    let username = session[Sid]
-    res.json(userdata[username].Emotion)
-})
-
-app.post('/currid', (req, res) => {
-    let {Sid} = req.body
-    if(!session[Sid]) res.json({error: 'Unauthorized'})
-    let username = session[Sid]
-    res.json(userdata[username].ID)
+app.post('/data', (req, res) => {
+    res.json(userdata[req.username])
 })
 
 app.listen(port, () => {
