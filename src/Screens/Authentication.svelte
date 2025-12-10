@@ -1,6 +1,5 @@
 <script>
     import { request } from '../lib/Auth';
-    import Icon from '../lib/Icons.svelte'
     import ThreeParticles from '../lib/ThreeParticles.svelte';
     export let goto
     let message = ''
@@ -8,6 +7,10 @@
     let password =''
     let login = async () => {
         let data = await request('/login',{username, password})
+        if(data.error){
+            message = data.error
+            return
+        }
         let Sid = data.Sid
         localStorage.setItem("Sid", Sid)
         goto('screen1')
