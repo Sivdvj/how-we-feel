@@ -18,5 +18,5 @@
         </div>
     </div>
 {:else}
-    <Icon {icon} class = {`w-${width} h-${height}`} />
+    <Icon {icon} class = {`w-${size} h-${size}`} />
 {/if}
