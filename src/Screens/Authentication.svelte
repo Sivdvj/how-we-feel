@@ -11,8 +11,6 @@
             message = data.error
             return
         }
-        let Sid = data.Sid
-        localStorage.setItem("Sid", Sid)
         goto('screen1')
     }
 </script>

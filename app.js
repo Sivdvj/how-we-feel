@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import crypto from 'crypto'
 import cookieParser from 'cookie-parser'
 
 const app = express()
@@ -77,6 +78,13 @@ app.post('/save', (req, res) => {
 
 app.post('/data', (req, res) => {
     res.json(userdata[req.username])
+})
+
+app.post('/logout', (req, res) => {
+    let Sid = req.cookies.Sid
+    delete session[Sid]
+    res.clearCookie('Sid')
+    res.json({ok : true})    
 })
 
 app.listen(port, () => {

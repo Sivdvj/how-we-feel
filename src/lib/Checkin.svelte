@@ -1,6 +1,5 @@
 <script>
     import Settings from "@iconify-svelte/material-symbols-light/settings-outline-rounded"
-    import Donate from "@iconify-svelte/material-symbols-light/heart-plus-outline"
     import Icons from "./Icons.svelte"
     import { request } from "./Auth";
     export let goto
@@ -15,9 +14,14 @@
             <button class = 'bg-gray-700/50 px-3 py-1 rounded-4xl hover:bg-gray-500/50'>24 emotions</button>
             <button class = 'bg-gray-700/50 px-3 py-1 rounded-4xl hover:bg-gray-500/50'>0 day streak</button>
         </div>
-        <div>
-            <Donate class = 'h-8 w-8 text-white opacity-70' />
-        </div>
+        <button class='text-white opacity-60 cursor-pointer hover:opacity-100' 
+            on:click={async () => {
+                await request("/logout")
+                localStorage.clear()
+            }}>
+            <div class="w-8 h-8 hidden"></div>
+            <Icons icon='solar:logout-outline' size={8} showCircle={false} />
+        </button>
     </div>
     <div class = 'w-full h-6/7'>
         <p class = 'text-white font-bold font-serif text-center text-3xl'>How are you feeling<br />this evening?</p>
