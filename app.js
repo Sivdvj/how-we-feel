@@ -1,5 +1,7 @@
 import express from 'express'
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
+
 const app = express()
 const port = 3000
 
@@ -7,21 +9,12 @@ let session = {}
 let users = {}
 let userdata = {}
 
-function randomString(){
-    let result = ''
-    let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-    let length = 10
-    let chl = characters.length
-    for(let i = 0; i < length; i++){
-        result += characters.charAt(Math.floor(Math.random() * chl))
-    }
-    return result
-}
-
 app.use(cors({
-    origin : 'http://localhost:5173'
+    origin : 'http://localhost:5173',
+    credentials : true
 }))
 app.use(express.json())
+app.use(cookieParser())
 
 app.post('/signin', (req, res) => {
     let {firstname, username, password} = req.body
@@ -56,17 +49,21 @@ app.post('/login', (req, res) => {
     if(users[username].Password != password){
         return res.status(401).json({error : 'Invalid Password'})
     }
-    let sid = randomString()
+    let sid = crypto.randomUUID();
     console.log(sid)
     session[sid] = username
     console.log(session[sid])
-    res.json({Sid: sid, ok : true})
+    res.cookie("Sid", sid, {
+        httpOnly : true,
+        secure : false,
+        sameSite : "lax"
+    })
+    res.json({ok : true})
 })
 
 app.use((req, res, next) => {
-    let {Sid} = req.body
-    console.log(session[Sid])
-    if(!session[Sid]) return res.status(401).json({error: 'Unauthorized'})
+    let Sid = req.cookies.Sid
+    if(!Sid || !session[Sid]) return res.status(401).json({error : 'Unauthorized'})
     req.username = session[Sid]
     next()
 })

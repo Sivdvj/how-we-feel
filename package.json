@@ -20,6 +20,7 @@
     "@iconify-svelte/material-symbols-light": "^1.0.3",
     "@tailwindcss/vite": "^4.1.14",
     "@types/three": "^0.180.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "express": "^5.2.1",
     "simplex-noise": "^4.0.3",
