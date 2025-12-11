@@ -1,5 +1,4 @@
 <script>
-    import Settings from "@iconify-svelte/material-symbols-light/settings-outline-rounded"
     import Icons from "./Icons.svelte"
     import { request } from "./Auth";
     export let goto
@@ -7,9 +6,9 @@
 
 <div class = 'w-full h-full flex flex-col p-y-0'>
     <div class = 'w-full h-1/7 flex flex-row justify-between items-start'>
-        <div>
-            <Settings class = 'h-8 w-8 text-white opacity-70'/>
-        </div>
+        <button class='text-white opacity-60 cursor-pointer hover:opacity-100' on:click={() => goto("sessions")}>
+            <Icons icon='material-symbols-light:lock-outline' size={8} showCircle={false} />
+        </button>
         <div class = 'text-white flex flex-row space-x-10 text-sm'>
             <button class = 'bg-gray-700/50 px-3 py-1 rounded-4xl hover:bg-gray-500/50'>24 emotions</button>
             <button class = 'bg-gray-700/50 px-3 py-1 rounded-4xl hover:bg-gray-500/50'>0 day streak</button>

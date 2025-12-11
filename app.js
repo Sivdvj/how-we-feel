@@ -56,7 +56,11 @@ app.post('/login', async (req, res) => {
     }
     let sid = crypto.randomUUID();
     console.log(sid)
-    session[sid] = username
+    session[sid] = {
+        Username: username,
+        createdAt: Date.now(),
+        userAgent: req.headers['user-agent']
+    }
     console.log(session[sid])
     res.cookie("Sid", sid, {
         httpOnly : true,
@@ -69,7 +73,7 @@ app.post('/login', async (req, res) => {
 app.use((req, res, next) => {
     let Sid = req.cookies.Sid
     if(!Sid || !session[Sid]) return res.status(401).json({error : 'Unauthorized'})
-    req.username = session[Sid]
+    req.username = session[Sid].Username
     next()
 })
 
@@ -89,6 +93,35 @@ app.post('/logout', (req, res) => {
     delete session[Sid]
     res.clearCookie('Sid')
     res.json({ok : true})    
+})
+
+app.post('/sessions', (req, res) => {
+    let list = []
+    for(let i in session){
+        if(session[i].Username === req.username)
+            list.push({Sid : i, ...session[i]})
+    }
+    res.json({ok : true, list})
+})
+
+app.post('/revoke', (req, res) => {
+    let {Sid} = req.body
+    if(session[Sid].Username !== req.username){
+        return res.status(401).json({error : "Unauthorized"})
+    }
+    delete session[Sid]
+    res.json({ok : true})
+
+})
+
+app.post('/revokeAll', (req, res) => {
+    let currSid = req.cookies.Sid
+    for(let i in session){
+        if(session[i].Username === req.username && i != currSid){
+            delete session[i]
+        }
+    }
+    res.json({ok : true})
 })
 
 app.listen(port, () => {

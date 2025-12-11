@@ -9,7 +9,7 @@ export async function request(path, data = {}){
     let response = await res.json();
 
     if(!res.ok){
-        if(response.error !== 'Authentication'){
+        if(response.error !== 'Unauthorized'){
             return {error: response.error}
         }
         localStorage.clear()

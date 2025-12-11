@@ -8,6 +8,8 @@
     import Screen7 from "./Screens/Screen-7.svelte"
     import Authentication from "./Screens/Authentication.svelte"
     import Signin from "./Screens/Signin.svelte"
+    import Session from "./Screens/Sessions.svelte"
+
     let screen = localStorage.getItem("ScreenName") || "authentication"
     
     function goto(screenName){
@@ -20,6 +22,8 @@
     <Authentication {goto} />
 {:else if screen == "signin"}
     <Signin {goto} />
+{:else if screen == "sessions"}
+    <Session {goto} />
 {:else if screen == "screen1"}
     <Screen1 {goto} />
 {:else if screen == "screen2"}
