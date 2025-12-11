@@ -21,10 +21,10 @@ app.use(cookieParser())
 app.post('/signin', async (req, res) => {
     let {firstname, username, password} = req.body
     if(!username || !password){
-        return res.status(401).json({error : 'Missing fields'})
+        return res.status(400).json({error : 'Missing fields'})
     }
     if(users[username]){
-        return res.status(401).json({error : 'Username already exists'})
+        return res.status(400).json({error : 'Username already exists'})
     }
 
     let hashedPassword = await bcrypt.hash(password, 10)
@@ -44,15 +44,15 @@ app.post('/signin', async (req, res) => {
 app.post('/login', async (req, res) => {
     let {username, password} = req.body
     if(!username || !password){
-        return res.status(401).json({error : 'Missing fields'})
+        return res.status(400).json({error : 'Missing fields'})
     }
     if(!users[username]){
-        return res.status(401).json({error : 'Username does not exist'})
+        return res.status(400).json({error : 'Username does not exist'})
     }
     
     let match = await bcrypt.compare(password, users[username].Password)
     if(!match){
-        return res.status(401).json({error : 'Invalid Password'})
+        return res.status(400).json({error : 'Invalid Password'})
     }
     let sid = crypto.randomUUID();
     console.log(sid)

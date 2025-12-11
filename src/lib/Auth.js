@@ -7,13 +7,14 @@ export async function request(path, data = {}){
     })
 
     let response = await res.json();
+    console.log(res)
 
-    if(!res.ok){
-        if(response.error !== 'Unauthorized'){
-            return {error: response.error}
-        }
+    if(res.status == 401){
         localStorage.clear()
-        window.location.reload()
+        window.location.reload()     
+    }
+    
+    if(!res.ok){
         return {error: response.error}
     }
 
