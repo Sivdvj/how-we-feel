@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import crypto from 'crypto'
 import cookieParser from 'cookie-parser'
+import bcrypt from 'bcryptjs'
 
 const app = express()
 const port = 3000
@@ -17,7 +18,7 @@ app.use(cors({
 app.use(express.json())
 app.use(cookieParser())
 
-app.post('/signin', (req, res) => {
+app.post('/signin', async (req, res) => {
     let {firstname, username, password} = req.body
     if(!username || !password){
         return res.status(401).json({error : 'Missing fields'})
@@ -26,9 +27,10 @@ app.post('/signin', (req, res) => {
         return res.status(401).json({error : 'Username already exists'})
     }
 
+    let hashedPassword = await bcrypt.hash(password, 10)
     users[username] = {
         Name : firstname,
-        Password : password
+        Password : hashedPassword
     }
 
     userdata[username] = {
@@ -39,7 +41,7 @@ app.post('/signin', (req, res) => {
     res.json({ok : true})
 })
 
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
     let {username, password} = req.body
     if(!username || !password){
         return res.status(401).json({error : 'Missing fields'})
@@ -47,7 +49,9 @@ app.post('/login', (req, res) => {
     if(!users[username]){
         return res.status(401).json({error : 'Username does not exist'})
     }
-    if(users[username].Password != password){
+    
+    let match = await bcrypt.compare(password, users[username].Password)
+    if(!match){
         return res.status(401).json({error : 'Invalid Password'})
     }
     let sid = crypto.randomUUID();
