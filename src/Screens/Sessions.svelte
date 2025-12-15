@@ -37,19 +37,23 @@
         </div>
         <div class = 'w-full flex flex-col-reverse'>
             {#each Object.entries(data) as [id, session]}
-                <!-- TODO: error if user tries to revoke the current session -->
                 <div class="w-full mb-4 font-serif">
                     <div class="bg-white opacity-85 flex flex-row justify-between rounded-xl p-4">
                         <div class="flex flex-col">
                             <div><strong>Device: </strong>{session.userAgent}</div>
                             <div><strong>Created at:</strong>{new Date(session.createdAt).toLocaleString()}</div>
+                            {#if session.isCurrent}
+                                <div class="text-green-600 font-bold">(Current Session)</div>
+                            {/if}
                         </div>
-                        <button class="hover:cursor-pointer bg-gray-200 text-black rounded-3xl py-2 px-4 h-[40px] hover:bg-red-700 hover:text-white" 
-                            on:click={async () => {
-                                await request('/revoke', {Sid: session.Sid})
-                                window.location.reload()
-                            }}>
-                        Revoke</button> 
+                        {#if !session.isCurrent}
+                            <button class="hover:cursor-pointer bg-gray-200 text-black rounded-3xl py-2 px-4 h-[40px] hover:bg-red-700 hover:text-white" 
+                                on:click={async () => {
+                                    await request('/revoke', {Sid: session.Sid})
+                                    window.location.reload()
+                                }}>
+                            Revoke</button> 
+                        {/if}
                     </div>                   
                 </div>
             {/each}

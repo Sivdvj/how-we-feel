@@ -97,10 +97,17 @@ app.post('/logout', (req, res) => {
 
 app.post('/sessions', (req, res) => {
     let list = []
+    let current = null
     for(let i in session){
-        if(session[i].Username === req.username)
-            list.push({Sid : i, ...session[i]})
+        if(session[i].Username === req.username){
+            if(i === req.cookies.Sid){
+                current = {Sid : i, isCurrent: true, ...session[i]}
+            } else {
+                list.push({Sid : i, isCurrent: false, ...session[i]})
+            }
+        }
     }
+    if(current) list.push(current)
     res.json({ok : true, list})
 })
 
@@ -108,6 +115,9 @@ app.post('/revoke', (req, res) => {
     let {Sid} = req.body
     if(session[Sid].Username !== req.username){
         return res.status(401).json({error : "Unauthorized"})
+    }
+    if(Sid === req.cookies.Sid){
+        return res.status(400).json({error : "Cannot revoke current session"})
     }
     delete session[Sid]
     res.json({ok : true})
