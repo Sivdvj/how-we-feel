@@ -12,7 +12,7 @@ let users = {}
 let userdata = {}
 
 app.use(cors({
-    origin : 'http://localhost:5173',
+    origin : 'http://sivaranjani.me',
     credentials : true
 }))
 app.use(express.json())

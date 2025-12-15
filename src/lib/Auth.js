@@ -1,5 +1,5 @@
 export async function request(path, data = {}){
-    let res = await fetch(`http://localhost:3000${path}`, {
+    let res = await fetch(`http://api.sivaranjani.me${path}`, {
         method: "POST",
         credentials: "include",
         headers: {"Content-Type": "application/json"},
