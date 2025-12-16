@@ -8,11 +8,13 @@
         data = await request("/data")
         data = data.Emotion
     })
+    
+    // TODO: change image paths based on color
     function getImage(color){
-        if(color == "#ffa500") return "src/assets/1.png"
-        else if(color == "#83f28f") return "src/assets/2.png"
-        else if(color == "#90d5ff") return "src/assets/3.png"
-        else return "src/assets/4.png"
+        if(color == "#ffa500") return "assets/1.png"
+        else if(color == "#83f28f") return "assets/2.png"
+        else if(color == "#90d5ff") return "assets/3.png"
+        else return "assets/4.png"
     }
 </script>
 <main>
