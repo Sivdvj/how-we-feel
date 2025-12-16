@@ -12,9 +12,10 @@ let users = {}
 let userdata = {}
 
 app.use(cors({
-    origin : 'http://sivaranjani.me',
+    origin : process.env.FRONTEND_URL,
     credentials : true
 }))
+
 app.use(express.json())
 app.use(cookieParser())
 

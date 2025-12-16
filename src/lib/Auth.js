@@ -1,5 +1,7 @@
+let API_BASE = import.meta.env.VITE_API_URL
+
 export async function request(path, data = {}){
-    let res = await fetch(`http://api.sivaranjani.me${path}`, {
+    let res = await fetch(`${API_BASE}${path}`, {
         method: "POST",
         credentials: "include",
         headers: {"Content-Type": "application/json"},
