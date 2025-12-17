@@ -66,7 +66,7 @@ app.post('/login', async (req, res) => {
     console.log(session[sid])
     res.cookie("Sid", sid, {
         httpOnly : true,
-        secure : false,
+        secure : process.env.FRONTEND_URL.startsWith("https"),
         sameSite : "lax"
     })
     res.json({ok : true})
