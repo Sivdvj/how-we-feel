@@ -18,24 +18,28 @@
     }
 </script>
 
-{#if screen == "authentication"}
-    <Authentication {goto} />
-{:else if screen == "signin"}
-    <Signin {goto} />
-{:else if screen == "sessions"}
-    <Session {goto} />
-{:else if screen == "screen1"}
-    <Screen1 {goto} />
-{:else if screen == "screen2"}
-    <Screen2 {goto} />
-{:else if screen == "screen3"}
-    <Screen3 {goto} />
-{:else if screen == "screen4"}
-    <Screen4 {goto} />
-{:else if screen == "screen5"}
-    <Screen5 {goto} />
-{:else if screen == "screen6"}
-    <Screen6 {goto} />
-{:else if screen == "screen7"}
-    <Screen7 {goto} />
-{/if}
+<main class="w-screen h-screen bg-black flex justify-center overflow-hidden">
+    <div class="w-full max-w-[475px] h-full relative bg-black">
+        {#if screen == "authentication"}
+            <Authentication {goto} />
+        {:else if screen == "signin"}
+            <Signin {goto} />
+        {:else if screen == "sessions"}
+            <Session {goto} />
+        {:else if screen == "screen1"}
+            <Screen1 {goto} />
+        {:else if screen == "screen2"}
+            <Screen2 {goto} />
+        {:else if screen == "screen3"}
+            <Screen3 {goto} />
+        {:else if screen == "screen4"}
+            <Screen4 {goto} />
+        {:else if screen == "screen5"}
+            <Screen5 {goto} />
+        {:else if screen == "screen6"}
+            <Screen6 {goto} />
+        {:else if screen == "screen7"}
+            <Screen7 {goto} />
+        {/if}
+    </div>
+</main>
