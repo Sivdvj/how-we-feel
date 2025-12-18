@@ -11,34 +11,62 @@
 	onMount(() => {
 		let prevX = 0,
 			prevY = 0;
+		let isDragging = false;
+
+		function handleStart(x, y) {
+			prevX = x;
+			prevY = y;
+		}
+
+		function handleMove(x, y) {
+			let deltaX = x - prevX;
+			let deltaY = y - prevY;
+
+			offsetX += deltaX;
+			offsetY += deltaY;
+
+			prevX = x;
+			prevY = y;
+
+			if (offsetX > 600) offsetX = 600;
+			if (offsetX < -600) offsetX = -600;
+			if (offsetY > 600) offsetY = 600;
+			if (offsetY < -600) offsetY = -600;
+		}
+
 		canvas.addEventListener("touchstart", (e) => {
 			e.preventDefault();
-			prevX = e.touches[0].pageX;
-			prevY = e.touches[0].pageY;
+			handleStart(e.touches[0].pageX, e.touches[0].pageY);
 		});
+
 		canvas.addEventListener(
 			"touchmove",
 			(e) => {
 				e.preventDefault();
-				let x = e.touches[0].pageX;
-				let y = e.touches[0].pageY;
-
-				let deltaX = x - prevX;
-				let deltaY = y - prevY;
-
-				offsetX += deltaX;
-				offsetY += deltaY;
-
-				prevX = x;
-				prevY = y;
-
-				if (offsetX > 600) offsetX = 600;
-				if (offsetX < -600) offsetX = -600;
-				if (offsetY > 600) offsetY = 600;
-				if (offsetY < -600) offsetY = -600;
+				handleMove(e.touches[0].pageX, e.touches[0].pageY);
 			},
 			{ passive: false },
 		);
+
+		// Mouse events
+		canvas.addEventListener("mousedown", (e) => {
+			isDragging = true;
+			e.preventDefault();
+			handleStart(e.pageX, e.pageY);
+		});
+
+		canvas.addEventListener("mousemove", (e) => {
+			if (!isDragging) return;
+			e.preventDefault();
+			handleMove(e.pageX, e.pageY);
+		});
+
+		const stopDragging = () => {
+			isDragging = false;
+		};
+
+		canvas.addEventListener("mouseup", stopDragging);
+		canvas.addEventListener("mouseleave", stopDragging);
 	});
 </script>
 
