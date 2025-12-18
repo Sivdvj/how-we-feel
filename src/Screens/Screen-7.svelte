@@ -1,13 +1,18 @@
 <script>
-    import Ecomp from '../lib/EmotionComp.svelte'
-    import Icons from "../lib/Icons.svelte"
-    export let goto  
+	import Ecomp from "../lib/EmotionComp.svelte";
+	import Icons from "../lib/Icons.svelte";
+	export let goto;
 </script>
 
-<div class = 'w-full h-full p-4 overflow-y-auto scrollbar-hide scroll-smooth space-y-5'>
-    <button class = 'text-3xl text-white flex justify-center w-full opacity-80' on:click={() => goto('screen1')}>
-        <Icons icon = 'material-symbols-light:family-home-outline-rounded' size={20} width={20} height={20} showCircle={false}/>
-    </button>
-    <Ecomp />
-    
+<div class="scrollbar-hide h-full w-full space-y-5 overflow-y-auto scroll-smooth p-4">
+	<button class="flex w-full justify-center text-3xl text-white opacity-80" on:click={() => goto("screen1")}>
+		<Icons icon="material-symbols-light:family-home-outline-rounded" size={20} width={20} height={20} showCircle={false} />
+	</button>
+	<Ecomp />
 </div>
+
+<style>
+	.scrollbar-hide::-webkit-scrollbar {
+		display: none;
+	}
+</style>
