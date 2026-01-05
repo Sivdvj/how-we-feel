@@ -4,13 +4,19 @@ import cors from "cors";
 import crypto from "crypto";
 import cookieParser from "cookie-parser";
 import bcrypt from "bcryptjs";
+import pg from "pg";
+const { Pool } = pg;
+
+export const pool = new Pool({
+	host: "localhost",
+	port: 5432,
+	user: "postgres",
+	password: "postgres",
+	database: "postgres",
+});
 
 const app = express();
 const port = 3000;
-
-let session = {};
-let users = {};
-let userdata = {};
 
 app.use(
 	cors({
@@ -24,25 +30,18 @@ app.use(cookieParser());
 
 app.post("/signin", async (req, res) => {
 	let { firstname, username, password } = req.body;
-	if (!username || !password) {
+	if (!username || !password || !firstname) {
 		return res.status(400).json({ error: "Missing fields" });
-	}
-	if (users[username]) {
-		return res.status(400).json({ error: "Username already exists" });
 	}
 
 	let hashedPassword = await bcrypt.hash(password, 10);
-	users[username] = {
-		Name: firstname,
-		Password: hashedPassword,
-	};
 
-	userdata[username] = {
-		ID: 0,
-		Emotion: {},
-	};
-
-	res.json({ ok: true });
+	try {
+		await pool.query(`INSERT INTO users (username, password, name) VALUES ($1, $2, $3)`, [username, hashedPassword, firstname]);
+		res.json({ ok: true });
+	} catch (err) {
+		return res.status(400).json({ error: "Username already exits" });
+	}
 });
 
 app.post("/login", async (req, res) => {
@@ -50,22 +49,38 @@ app.post("/login", async (req, res) => {
 	if (!username || !password) {
 		return res.status(400).json({ error: "Missing fields" });
 	}
-	if (!users[username]) {
+
+	let result = await pool.query(`SELECT id, password FROM users WHERE username = $1`, [username]);
+
+	if (result.rowCount === 0) {
 		return res.status(400).json({ error: "Username does not exist" });
 	}
 
-	let match = await bcrypt.compare(password, users[username].Password);
+	let userData = result.rows[0];
+	let match = await bcrypt.compare(password, userData.password);
 	if (!match) {
 		return res.status(400).json({ error: "Invalid Password" });
 	}
-	let sid = crypto.randomUUID();
+
+	let client = await pool.connect();
+	let sid;
+	try {
+		await client.query("BEGIN");
+
+		await client.query(`SELECT 1 FROM sessions WHERE user_id = $1 FOR UPDATE`, [userData.id]);
+		let tokenGen = await client.query(`SELECT COALESCE(MAX(token), 0) + 1 as next_token FROM sessions WHERE user_id = $1`, [userData.id]);
+		let token = tokenGen.rows[0].next_token;
+		sid = crypto.randomUUID();
+
+		await client.query("INSERT into sessions (user_id, token, session_id, user_agent) VALUES ($1, $2, $3, $4)", [userData.id, token, sid, req.headers["user-agent"]]);
+		await client.query("COMMIT");
+	} catch (e) {
+		await client.query("ROLLBACK");
+	} finally {
+		client.release();
+	}
 	console.log(sid);
-	session[sid] = {
-		Username: username,
-		createdAt: Date.now(),
-		userAgent: req.headers["user-agent"],
-	};
-	console.log(session[sid]);
+
 	res.cookie("Sid", sid, {
 		httpOnly: true,
 		secure: process.env.FRONTEND_URL.startsWith("https"),
@@ -74,66 +89,54 @@ app.post("/login", async (req, res) => {
 	res.json({ ok: true });
 });
 
-app.use((req, res, next) => {
-	let Sid = req.cookies.Sid;
-	if (!Sid || !session[Sid]) return res.status(401).json({ error: "Unauthorized" });
-	req.username = session[Sid].Username;
+app.use(async (req, res, next) => {
+	let sid = req.cookies.Sid;
+	if (!sid) return res.status(401).json({ error: "Unauthorized" });
+
+	let resp = await pool.query(`SELECT user_id, token FROM sessions WHERE session_id = $1`, [sid]);
+	if (resp.rowCount === 0) return res.status(401).json({ error: "Unauthorized" });
+
+	req.userID = resp.rows[0].user_id;
+	req.token = resp.rows[0].token;
 	next();
 });
 
-app.post("/save", (req, res) => {
+app.post("/save", async (req, res) => {
 	let { Id, emo, color } = req.body;
-	userdata[req.username].ID = Id;
-	userdata[req.username].Emotion[Id] = { emotion: emo, color: color };
+
+	await pool.query(`INSERT INTO emotions (user_id, emotion_id, emotion, color) VALUES ($1, $2, $3, $4)`, [req.userID, Id, emo, color]);
 	res.json({ ok: true });
 });
 
-app.post("/data", (req, res) => {
-	res.json(userdata[req.username]);
+app.post("/data", async (req, res) => {
+	let dataFetch = await pool.query(`SELECT emotion_id, emotion, color FROM emotions WHERE user_id = $1`, [req.userID]);
+	//TODO: how to format the data according to the frontend
+	res.json(dataFetch.rows);
 });
 
-app.post("/logout", (req, res) => {
-	let Sid = req.cookies.Sid;
-	delete session[Sid];
+app.post("/logout", async (req, res) => {
+	await pool.query(`DELETE FROM sessions WHERE user_id = $1 AND token = $2`, [req.userID, req.token]);
 	res.clearCookie("Sid");
 	res.json({ ok: true });
 });
 
-app.post("/sessions", (req, res) => {
-	let list = [];
-	let current = null;
-	for (let i in session) {
-		if (session[i].Username === req.username) {
-			if (i === req.cookies.Sid) {
-				current = { Sid: i, isCurrent: true, ...session[i] };
-			} else {
-				list.push({ Sid: i, isCurrent: false, ...session[i] });
-			}
-		}
-	}
-	if (current) list.push(current);
+app.post("/sessions", async (req, res) => {
+	//TODO: format data for frontend
+	let currentSession = await pool.query(`SELECT session_id, user_agent, created_at FROM sessions WHERE user_id = $1 AND token = $2`, [req.userID, req.token]);
+	let sessionResult = await pool.query(`SELECT session_id, user_agent, created_at FROM sessions WHERE user_id = $1`, [req.userID]);
+	let list = { ...currentSession.rows, ...sessionResult.rows };
 	res.json({ ok: true, list });
 });
 
-app.post("/revoke", (req, res) => {
-	let { Sid } = req.body;
-	if (session[Sid].Username !== req.username) {
-		return res.status(401).json({ error: "Unauthorized" });
-	}
-	if (Sid === req.cookies.Sid) {
-		return res.status(400).json({ error: "Cannot revoke current session" });
-	}
-	delete session[Sid];
+app.post("/revoke", async (req, res) => {
+	let { token } = req.body;
+	if (token <= req.token) return res.status(401).json({ error: "Forbidden" });
+	await pool.query(`DELETE FROM sessions WHERE token = $1 AND user_id = $2`, [token, req.userID]);
 	res.json({ ok: true });
 });
 
-app.post("/revokeAll", (req, res) => {
-	let currSid = req.cookies.Sid;
-	for (let i in session) {
-		if (session[i].Username === req.username && i != currSid) {
-			delete session[i];
-		}
-	}
+app.post("/revokeAll", async (req, res) => {
+	await pool.query(`DELETE FROM sessions WHERE user_id = $1 AND token > $2`, [req.userID, req.token]);
 	res.json({ ok: true });
 });
 
