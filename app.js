@@ -109,9 +109,17 @@ app.post("/save", async (req, res) => {
 });
 
 app.post("/data", async (req, res) => {
-	let dataFetch = await pool.query(`SELECT emotion_id, emotion, color FROM emotions WHERE user_id = $1`, [req.userID]);
-	//TODO: how to format the data according to the frontend
-	res.json(dataFetch.rows);
+	let dataFetch = await pool.query(`SELECT emotion_id, emotion, color FROM emotions WHERE user_id = $1 ORDER BY emotion_id`, [req.userID]);
+	let emotions = {};
+	let max_id = 0;
+	dataFetch.rows.forEach((row) => {
+		emotions[row.emotion_id] = {
+			emotion: row.emotion,
+			color: row.color,
+		};
+		max_id = Math.max(max_id, row.emotion_id);
+	});
+	res.json({ Emotion: emotions, ID: max_id });
 });
 
 app.post("/logout", async (req, res) => {
@@ -121,10 +129,24 @@ app.post("/logout", async (req, res) => {
 });
 
 app.post("/sessions", async (req, res) => {
-	//TODO: format data for frontend
 	let currentSession = await pool.query(`SELECT session_id, user_agent, created_at FROM sessions WHERE user_id = $1 AND token = $2`, [req.userID, req.token]);
 	let sessionResult = await pool.query(`SELECT session_id, user_agent, created_at FROM sessions WHERE user_id = $1`, [req.userID]);
-	let list = { ...currentSession.rows, ...sessionResult.rows };
+	let list = {};
+	sessionResult.rows.forEach((row) => {
+		list[row.session_id] = {
+			userAgent: row.user_agent,
+			createdAt: row.created_at,
+			isCurrent: false,
+		};
+	});
+	if (currentSession.rows.length > 0) {
+		let curr = currentSession.rows[0];
+		list[curr.session_id] = {
+			userAgent: curr.user_agent,
+			createdAt: curr.created_at,
+			isCurrent: true,
+		};
+	}
 	res.json({ ok: true, list });
 });
 
