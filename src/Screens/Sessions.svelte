@@ -54,7 +54,7 @@
 						<button
 							class="h-[40px] rounded-3xl bg-gray-200 px-4 py-2 text-black hover:cursor-pointer hover:bg-red-700 hover:text-white"
 							on:click={async () => {
-								await request("/revoke", { Sid: session.Sid });
+								await request("/revoke", { token: id });
 								window.location.reload();
 							}}
 						>

@@ -129,11 +129,11 @@ app.post("/logout", async (req, res) => {
 });
 
 app.post("/sessions", async (req, res) => {
-	let currentSession = await pool.query(`SELECT session_id, user_agent, created_at FROM sessions WHERE user_id = $1 AND token = $2`, [req.userID, req.token]);
-	let sessionResult = await pool.query(`SELECT session_id, user_agent, created_at FROM sessions WHERE user_id = $1`, [req.userID]);
+	let currentSession = await pool.query(`SELECT token, session_id, user_agent, created_at FROM sessions WHERE user_id = $1 AND token = $2`, [req.userID, req.token]);
+	let sessionResult = await pool.query(`SELECT token, session_id, user_agent, created_at FROM sessions WHERE user_id = $1`, [req.userID]);
 	let list = {};
 	sessionResult.rows.forEach((row) => {
-		list[row.session_id] = {
+		list[row.token] = {
 			userAgent: row.user_agent,
 			createdAt: row.created_at,
 			isCurrent: false,
@@ -141,7 +141,7 @@ app.post("/sessions", async (req, res) => {
 	});
 	if (currentSession.rows.length > 0) {
 		let curr = currentSession.rows[0];
-		list[curr.session_id] = {
+		list[curr.token] = {
 			userAgent: curr.user_agent,
 			createdAt: curr.created_at,
 			isCurrent: true,
